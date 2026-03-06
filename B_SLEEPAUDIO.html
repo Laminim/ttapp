@@ -1,0 +1,1203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>MyTinnitus – Audio Mixer</title>
+<style>
+:root{
+  --bg0:#070a12;
+  --bg1:#0b1020;
+  --card:#101727;
+  --card2:#0d1423;
+  --line:#22314a;
+  --text:#f5f7ff;
+  --muted:#b6c2de;
+  --accent:#ff6b7a;
+  --shadow:0 10px 28px rgba(0,0,0,.45);
+  --radius:18px;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
+*{box-sizing:border-box}
+
+body{
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 600px at 50% -200px, rgba(255,255,255,.12), transparent 55%),
+    radial-gradient(900px 500px at 20% -150px, rgba(106,166,255,.12), transparent 58%),
+    linear-gradient(180deg, var(--bg1), var(--bg0));
+}
+
+.phone{
+  width:100%;
+  max-width:393px;
+  height:100dvh;
+  margin:0 auto;
+  padding:16px 14px 24px;
+  overflow-x:hidden;
+  overflow-y:auto;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+
+.phone::-webkit-scrollbar{display:none}
+
+.card{
+  margin-top:14px;
+  background:linear-gradient(180deg, rgba(255,255,255,.03), transparent 55%), var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:14px;
+}
+
+.sectionTitle{
+  text-align:center;
+  font-weight:750;
+  font-size:16px;
+  margin:4px 0 18px;
+}
+
+.fieldBlock{
+  margin-top:12px;
+}
+
+label{
+  display:block;
+  font-size:12px;
+  font-weight:750;
+  color:var(--muted);
+  margin:0 0 8px;
+}
+
+select,
+input[type="text"],
+input[type="number"]{
+  width:100%;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)), var(--card2);
+  color:var(--text);
+  padding:14px;
+  font-size:16px;
+  outline:none;
+  box-shadow:var(--shadow);
+}
+
+.sliderStack{
+  display:grid;
+  gap:12px;
+  margin-top:14px;
+  width:90%;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.sliderCard{
+  background:rgba(255,255,255,.02);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:16px;
+  padding:12px;
+}
+
+.sliderHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  font-size:13px;
+  font-weight:700;
+  margin-bottom:10px;
+}
+
+.sliderVal{
+  color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+
+input[type="range"]{
+  width:100%;
+  -webkit-appearance:none;
+  appearance:none;
+  height:5px;
+  border-radius:999px;
+  background:rgba(255,255,255,.12);
+  outline:none;
+  box-shadow:0 0 10px rgba(255,107,122,.18), inset 0 0 6px rgba(0,0,0,.55);
+  touch-action:none;
+}
+
+input[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 0 6px rgba(255,107,122,.18), 0 0 12px rgba(255,107,122,.55);
+  border:none;
+  cursor:pointer;
+}
+
+input[type="range"]::-moz-range-thumb{
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  background:var(--accent);
+  border:none;
+  box-shadow:0 0 0 6px rgba(255,107,122,.18), 0 0 12px rgba(255,107,122,.55);
+  cursor:pointer;
+}
+
+.playArea{
+  position:relative;
+  width:100%;
+  height:96px;
+  margin-top:10px;
+}
+
+.bigPlay{
+  position:absolute;
+  left:50%;
+  top:6px;
+  transform:translateX(-50%);
+  width:84px;
+  height:84px;
+  border-radius:999px;
+  border:4px solid rgba(255,255,255,.92);
+  background:transparent;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+}
+
+.bigPlay svg{
+  width:40px;
+  height:40px;
+  fill:rgba(255,255,255,.95);
+}
+
+.bigPlay.stop{
+  border-color:rgba(255,107,122,.95);
+}
+
+.bigPlay.stop svg{
+  fill:rgba(255,107,122,.95);
+}
+
+.birdWrap{
+  position:absolute;
+  left:calc(50% + 82px);
+  top:28px;
+  width:38px;
+  height:38px;
+  pointer-events:none;
+}
+
+.bird{
+  position:relative;
+  width:38px;
+  height:38px;
+  transform-origin:50% 70%;
+}
+
+.birdPart{
+  position:absolute;
+  background:var(--accent);
+}
+
+.birdA .body{
+  left:7px;
+  top:10px;
+  width:22px;
+  height:17px;
+  border-radius:58% 50% 54% 52%;
+  transform:rotate(8deg);
+}
+
+.birdA .head{
+  left:4px;
+  top:7px;
+  width:11px;
+  height:11px;
+  border-radius:50%;
+}
+
+.birdA .beak{
+  left:-1px;
+  top:11px;
+  width:10px;
+  height:6px;
+  clip-path:polygon(0 50%, 100% 0, 100% 100%);
+  transform:rotate(-10deg);
+}
+
+.birdA .tail{
+  left:25px;
+  top:16px;
+  width:12px;
+  height:7px;
+  clip-path:polygon(0 50%, 100% 0, 84% 46%, 100% 100%);
+  transform:rotate(10deg);
+}
+
+.birdA .wing{
+  left:14px;
+  top:15px;
+  width:14px;
+  height:8px;
+  border-radius:90% 25% 70% 40%;
+  transform:rotate(12deg);
+}
+
+.birdA .wing2{
+  left:16px;
+  top:18px;
+  width:12px;
+  height:5px;
+  border-radius:90% 30% 80% 40%;
+  transform:rotate(15deg);
+}
+
+.birdA .leg1,
+.birdA .leg2{
+  width:2px;
+  height:10px;
+  top:25px;
+  border-radius:2px;
+}
+
+.birdA .leg1{
+  left:18px;
+  transform:rotate(36deg);
+}
+.birdA .leg2{
+  left:23px;
+  transform:rotate(20deg);
+}
+
+.birdA .foot1,
+.birdA .foot2{
+  height:3px;
+  border-radius:8px;
+  top:33px;
+}
+
+.birdA .foot1{
+  left:12px;
+  width:11px;
+  transform:rotate(-6deg);
+}
+.birdA .foot2{
+  left:20px;
+  width:11px;
+  transform:rotate(4deg);
+}
+
+.birdB .body{
+  left:8px;
+  top:11px;
+  width:21px;
+  height:16px;
+  border-radius:54% 50% 58% 50%;
+  transform:rotate(6deg);
+}
+
+.birdB .head{
+  left:5px;
+  top:7px;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+}
+
+.birdB .crest{
+  left:9px;
+  top:4px;
+  width:6px;
+  height:5px;
+  clip-path:polygon(0 100%, 32% 0, 58% 100%, 100% 18%, 82% 100%);
+  transform:rotate(-10deg);
+}
+
+.birdB .beak{
+  left:-1px;
+  top:10px;
+  width:9px;
+  height:5px;
+  clip-path:polygon(0 50%, 100% 0, 100% 100%);
+  transform:rotate(-18deg);
+}
+
+.birdB .tail{
+  left:24px;
+  top:15px;
+  width:13px;
+  height:8px;
+  clip-path:polygon(0 50%, 100% 6%, 88% 50%, 100% 94%);
+  transform:rotate(6deg);
+}
+
+.birdB .wing{
+  left:13px;
+  top:15px;
+  width:15px;
+  height:7px;
+  border-radius:90% 22% 78% 40%;
+  transform:rotate(9deg);
+}
+
+.birdB .wing2{
+  left:16px;
+  top:18px;
+  width:13px;
+  height:5px;
+  border-radius:85% 24% 82% 36%;
+  transform:rotate(12deg);
+}
+
+.birdB .leg1,
+.birdB .leg2{
+  width:2px;
+  height:10px;
+  top:25px;
+  border-radius:2px;
+}
+
+.birdB .leg1{
+  left:18px;
+  transform:rotate(28deg);
+}
+.birdB .leg2{
+  left:23px;
+  transform:rotate(12deg);
+}
+
+.birdB .foot1,
+.birdB .foot2{
+  height:3px;
+  border-radius:8px;
+  top:33px;
+}
+
+.birdB .foot1{
+  left:12px;
+  width:10px;
+  transform:rotate(-4deg);
+}
+.birdB .foot2{
+  left:21px;
+  width:10px;
+  transform:rotate(5deg);
+}
+
+.note{
+  position:absolute;
+  font-size:11px;
+  line-height:1;
+  color:var(--accent);
+  opacity:0;
+  transform:translateY(4px) scale(.85);
+}
+
+.note1{ left:0; top:1px; }
+.note2{ left:8px; top:-5px; font-size:10px; }
+.note3{ left:16px; top:-1px; font-size:9px; }
+
+.birdWrap.active .note1{
+  animation:noteFloat 1.4s ease-in-out infinite;
+}
+.birdWrap.active .note2{
+  animation:noteFloat 1.4s ease-in-out .22s infinite;
+}
+.birdWrap.active .note3{
+  animation:noteFloat 1.4s ease-in-out .44s infinite;
+}
+
+.birdWrap.active .bird{
+  animation:birdBob 1.2s ease-in-out infinite;
+}
+
+@keyframes noteFloat{
+  0%{ opacity:0; transform:translateY(4px) scale(.8); }
+  18%{ opacity:1; }
+  60%{ opacity:1; }
+  100%{ opacity:0; transform:translateY(-10px) scale(1.04); }
+}
+
+@keyframes birdBob{
+  0%{ transform:translateY(0) rotate(0deg); }
+  50%{ transform:translateY(-1px) rotate(-2deg); }
+  100%{ transform:translateY(0) rotate(0deg); }
+}
+
+.timerDisplay{
+  margin-top:14px;
+  width:100%;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)), var(--card2);
+  color:var(--text);
+  box-shadow:var(--shadow);
+  padding:16px 14px;
+  text-align:center;
+}
+
+.timerLabel{
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:6px;
+  font-weight:700;
+}
+
+.timerValue{
+  font-size:28px;
+  line-height:1;
+  font-weight:850;
+  letter-spacing:.03em;
+  font-variant-numeric:tabular-nums;
+}
+
+.timerSub{
+  margin-top:8px;
+  font-size:12px;
+  color:var(--muted);
+}
+
+.cta,
+.smallBtn{
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)), var(--card2);
+  color:var(--text);
+  box-shadow:var(--shadow);
+  cursor:pointer;
+}
+
+.cta{
+  margin-top:14px;
+  width:100%;
+  padding:14px;
+  font-size:18px;
+  font-weight:750;
+  display:flex;
+  justify-content:center;
+}
+
+.list{
+  margin-top:14px;
+  border-radius:var(--radius);
+  overflow:hidden;
+  border:1px solid var(--line);
+  background:rgba(0,0,0,.15);
+  box-shadow:var(--shadow);
+}
+
+.preset{
+  padding:12px;
+  background:rgba(255,255,255,.02);
+}
+
+.preset + .preset{
+  border-top:1px solid rgba(255,255,255,.07);
+}
+
+.presetName{
+  font-weight:850;
+  font-size:17px;
+  line-height:1.15;
+}
+
+.presetSub{
+  margin-top:6px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.35;
+  word-break:break-word;
+}
+
+.presetActions{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+
+.smallBtn{
+  flex:1;
+  padding:11px 10px;
+  font-size:14px;
+  font-weight:750;
+}
+
+.smallBtn.danger{
+  color:#ffd2d7;
+}
+
+.emptyText{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.35;
+  text-align:center;
+}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <div class="card">
+    <div class="sectionTitle">Player A</div>
+
+    <div class="fieldBlock" style="width:90%; margin-left:auto; margin-right:auto;">
+      <label for="assetA">Audio file</label>
+      <select id="assetA">
+        <option value="">Select audio file</option>
+        <option value="assets/audio/garden.mp3">Garden</option>
+        <option value="assets/audio/citypark.mp3">City Park</option>
+        <option value="assets/audio/breathwork.mp3">Breathwork</option>
+        <option value="assets/audio/birds.mp3">Birds</option>
+      </select>
+    </div>
+
+    <div class="sliderStack">
+      <div class="sliderCard">
+        <div class="sliderHead"><span>Volume</span><span class="sliderVal" id="volumeAValue">100%</span></div>
+        <input id="volumeA" type="range" min="0" max="1.5" value="1" step="0.01"/>
+      </div>
+      <div class="sliderCard">
+        <div class="sliderHead"><span>Bass</span><span class="sliderVal" id="bassAValue">0 dB</span></div>
+        <input id="bassA" type="range" min="-24" max="24" value="0" step="1"/>
+      </div>
+      <div class="sliderCard">
+        <div class="sliderHead"><span>High</span><span class="sliderVal" id="highAValue">0 dB</span></div>
+        <input id="highA" type="range" min="-24" max="24" value="0" step="1"/>
+      </div>
+    </div>
+
+    <div class="playArea">
+      <button class="bigPlay" id="playA" type="button" aria-label="Play Player A">
+        <svg viewBox="0 0 64 64"><path d="M24 18v28l26-14z"/></svg>
+      </button>
+
+      <div class="birdWrap" id="birdA" aria-hidden="true">
+        <div class="bird birdA">
+          <div class="note note1">♪</div>
+          <div class="note note2">♫</div>
+          <div class="note note3">♪</div>
+
+          <div class="birdPart body"></div>
+          <div class="birdPart head"></div>
+          <div class="birdPart beak"></div>
+          <div class="birdPart tail"></div>
+          <div class="birdPart wing"></div>
+          <div class="birdPart wing2"></div>
+          <div class="birdPart leg1"></div>
+          <div class="birdPart leg2"></div>
+          <div class="birdPart foot1"></div>
+          <div class="birdPart foot2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sectionTitle">Player B</div>
+
+    <div class="fieldBlock" style="width:90%; margin-left:auto; margin-right:auto;">
+      <label for="assetB">Audio file</label>
+      <select id="assetB">
+        <option value="">Select audio file</option>
+        <option value="assets/audio/garden.mp3">Garden</option>
+        <option value="assets/audio/citypark.mp3">City Park</option>
+        <option value="assets/audio/breathwork.mp3">Breathwork</option>
+        <option value="assets/audio/whitenoise.mp3">White Noise</option>
+      </select>
+    </div>
+
+    <div class="sliderStack">
+      <div class="sliderCard">
+        <div class="sliderHead"><span>Volume</span><span class="sliderVal" id="volumeBValue">100%</span></div>
+        <input id="volumeB" type="range" min="0" max="1.5" value="1" step="0.01"/>
+      </div>
+      <div class="sliderCard">
+        <div class="sliderHead"><span>Bass</span><span class="sliderVal" id="bassBValue">0 dB</span></div>
+        <input id="bassB" type="range" min="-24" max="24" value="0" step="1"/>
+      </div>
+      <div class="sliderCard">
+        <div class="sliderHead"><span>High</span><span class="sliderVal" id="highBValue">0 dB</span></div>
+        <input id="highB" type="range" min="-24" max="24" value="0" step="1"/>
+      </div>
+    </div>
+
+    <div class="playArea">
+      <button class="bigPlay" id="playB" type="button" aria-label="Play Player B">
+        <svg viewBox="0 0 64 64"><path d="M24 18v28l26-14z"/></svg>
+      </button>
+
+      <div class="birdWrap" id="birdB" aria-hidden="true">
+        <div class="bird birdB">
+          <div class="note note1">♪</div>
+          <div class="note note2">♫</div>
+          <div class="note note3">♪</div>
+
+          <div class="birdPart body"></div>
+          <div class="birdPart head"></div>
+          <div class="birdPart crest"></div>
+          <div class="birdPart beak"></div>
+          <div class="birdPart tail"></div>
+          <div class="birdPart wing"></div>
+          <div class="birdPart wing2"></div>
+          <div class="birdPart leg1"></div>
+          <div class="birdPart leg2"></div>
+          <div class="birdPart foot1"></div>
+          <div class="birdPart foot2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sectionTitle">Sleep Timer</div>
+
+    <div class="fieldBlock" style="margin-top:0;">
+      <label for="sleepMinutes">Minutes</label>
+      <input id="sleepMinutes" type="number" min="1" max="1440" step="1" value="30"/>
+    </div>
+
+    <div class="timerDisplay">
+      <div class="timerLabel">Remaining time</div>
+      <div class="timerValue" id="timerValue">--:--</div>
+      <div class="timerSub" id="timerSub">No timer active</div>
+    </div>
+
+    <div class="presetActions" style="margin-top:14px;">
+      <button class="smallBtn" id="startSleep" type="button">Start timer</button>
+      <button class="smallBtn danger" id="resetSleep" type="button">Reset timer</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sectionTitle">Save Preset</div>
+
+    <div class="fieldBlock" style="margin-top:0;">
+      <label for="presetName">Preset name</label>
+      <input id="presetName" type="text" placeholder="Night Mix 1"/>
+    </div>
+
+    <button class="cta" id="savePreset" type="button">Save current preset</button>
+  </div>
+
+  <div class="list" id="presetList"></div>
+
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+class Deck {
+  constructor(id, button, bird) {
+    this.id = id;
+    this.button = button;
+    this.bird = bird;
+    this.audio = new Audio();
+    this.audio.loop = true;
+    this.audio.preload = 'auto';
+    this.audio.playsInline = true;
+    this.loadedAsset = '';
+    this.sourceNode = null;
+    this.bassNode = null;
+    this.highNode = null;
+    this.gainNode = null;
+    this.isPlaying = false;
+    this.isBusy = false;
+  }
+}
+
+const LS_KEY = 'mytinnitus_audio_mixer_presets_v4';
+const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+const audioCtx = new AudioContextClass();
+const masterGain = audioCtx.createGain();
+masterGain.gain.value = 1;
+masterGain.connect(audioCtx.destination);
+
+const deckA = new Deck('A', $('playA'), $('birdA'));
+const deckB = new Deck('B', $('playB'), $('birdB'));
+
+let sleepTimerId = null;
+let sleepFadeId = null;
+let countdownIntervalId = null;
+let sleepEndTime = null;
+const FADE_SECONDS = 60;
+
+const state = {
+  presets: loadPresets()
+};
+
+async function ensureAudio() {
+  if (audioCtx.state !== 'running') {
+    await audioCtx.resume();
+  }
+}
+
+function setPlayBtnVisual(btn, isStop) {
+  btn.classList.toggle('stop', !!isStop);
+  btn.innerHTML = isStop
+    ? '<svg viewBox="0 0 64 64"><path d="M22 22h20v20H22z"/></svg>'
+    : '<svg viewBox="0 0 64 64"><path d="M24 18v28l26-14z"/></svg>';
+}
+
+function setBirdVisual(bird, active) {
+  if (!bird) return;
+  bird.classList.toggle('active', !!active);
+}
+
+function syncDeckVisual(deck) {
+  const active = !deck.audio.paused && !deck.audio.ended;
+  deck.isPlaying = active;
+  setPlayBtnVisual(deck.button, active);
+  setBirdVisual(deck.bird, active);
+}
+
+function fmtPercent(value) {
+  return Math.round(parseFloat(value) * 100) + '%';
+}
+
+function formatRemaining(ms) {
+  const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+}
+
+function setTimerDisplay(value, subtext) {
+  $('timerValue').textContent = value;
+  $('timerSub').textContent = subtext;
+}
+
+function resetTimerDisplay() {
+  setTimerDisplay('--:--', 'No timer active');
+}
+
+function updateCountdownDisplay() {
+  if (!sleepEndTime) {
+    resetTimerDisplay();
+    return;
+  }
+
+  const remaining = sleepEndTime - Date.now();
+  if (remaining <= 0) {
+    setTimerDisplay('00:00', 'Fade-out running');
+    return;
+  }
+
+  setTimerDisplay(formatRemaining(remaining), 'Timer active');
+}
+
+function wireDeckAudio(deck) {
+  if (deck.sourceNode) return;
+
+  deck.sourceNode = audioCtx.createMediaElementSource(deck.audio);
+
+  deck.bassNode = audioCtx.createBiquadFilter();
+  deck.bassNode.type = 'lowshelf';
+  deck.bassNode.frequency.value = 220;
+  deck.bassNode.gain.value = 0;
+
+  deck.highNode = audioCtx.createBiquadFilter();
+  deck.highNode.type = 'highshelf';
+  deck.highNode.frequency.value = 3200;
+  deck.highNode.gain.value = 0;
+
+  deck.gainNode = audioCtx.createGain();
+  deck.gainNode.gain.value = 1;
+
+  deck.sourceNode.connect(deck.bassNode);
+  deck.bassNode.connect(deck.highNode);
+  deck.highNode.connect(deck.gainNode);
+  deck.gainNode.connect(masterGain);
+
+  ['play', 'pause', 'ended'].forEach((eventName) => {
+    deck.audio.addEventListener(eventName, () => syncDeckVisual(deck));
+  });
+
+  deck.audio.addEventListener('error', () => {
+    console.error('Audio error on deck ' + deck.id, deck.audio.error);
+    syncDeckVisual(deck);
+  });
+}
+
+function loadPresets() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
+
+function persistPresets() {
+  localStorage.setItem(LS_KEY, JSON.stringify(state.presets));
+}
+
+function currentPresetData() {
+  return {
+    id: Date.now(),
+    name: $('presetName').value.trim() || 'Preset ' + new Date().toLocaleString(),
+    playerA: {
+      asset: $('assetA').value,
+      volume: $('volumeA').value,
+      bass: $('bassA').value,
+      high: $('highA').value
+    },
+    playerB: {
+      asset: $('assetB').value,
+      volume: $('volumeB').value,
+      bass: $('bassB').value,
+      high: $('highB').value
+    },
+    sleepMinutes: $('sleepMinutes').value
+  };
+}
+
+function updateSliderLabels() {
+  $('volumeAValue').textContent = fmtPercent($('volumeA').value);
+  $('bassAValue').textContent = $('bassA').value + ' dB';
+  $('highAValue').textContent = $('highA').value + ' dB';
+  $('volumeBValue').textContent = fmtPercent($('volumeB').value);
+  $('bassBValue').textContent = $('bassB').value + ' dB';
+  $('highBValue').textContent = $('highB').value + ' dB';
+}
+
+function applyDeckSettings(deck, refs) {
+  if (deck.gainNode) deck.gainNode.gain.value = parseFloat(refs.volume.value);
+  if (deck.bassNode) deck.bassNode.gain.value = parseFloat(refs.bass.value);
+  if (deck.highNode) deck.highNode.gain.value = parseFloat(refs.high.value);
+}
+
+function applyAllDeckSettings() {
+  applyDeckSettings(deckA, { volume: $('volumeA'), bass: $('bassA'), high: $('highA') });
+  applyDeckSettings(deckB, { volume: $('volumeB'), bass: $('bassB'), high: $('highB') });
+}
+
+function waitForAudioReady(audio) {
+  if (audio.readyState >= 2) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve, reject) => {
+    let done = false;
+
+    const cleanup = () => {
+      audio.removeEventListener('loadeddata', onReady);
+      audio.removeEventListener('canplay', onReady);
+      audio.removeEventListener('error', onError);
+    };
+
+    const onReady = () => {
+      if (done) return;
+      done = true;
+      cleanup();
+      resolve();
+    };
+
+    const onError = () => {
+      if (done) return;
+      done = true;
+      cleanup();
+      reject(new Error('Audio file could not be loaded.'));
+    };
+
+    audio.addEventListener('loadeddata', onReady, { once:true });
+    audio.addEventListener('canplay', onReady, { once:true });
+    audio.addEventListener('error', onError, { once:true });
+
+    setTimeout(() => {
+      if (done) return;
+      done = true;
+      cleanup();
+      resolve();
+    }, 2500);
+  });
+}
+
+async function ensureDeckSource(deck, assetPath) {
+  if (deck.loadedAsset === assetPath && deck.audio.src) {
+    return;
+  }
+
+  deck.audio.pause();
+
+  try {
+    deck.audio.currentTime = 0;
+  } catch {}
+
+  deck.audio.src = assetPath;
+  deck.audio.load();
+  deck.loadedAsset = assetPath;
+
+  await waitForAudioReady(deck.audio);
+}
+
+async function playDeck(deck, assetPath) {
+  if (!assetPath || deck.isBusy) return;
+
+  deck.isBusy = true;
+
+  try {
+    await ensureAudio();
+    wireDeckAudio(deck);
+    await ensureDeckSource(deck, assetPath);
+
+    try {
+      deck.audio.currentTime = 0;
+    } catch {}
+
+    const playPromise = deck.audio.play();
+    if (playPromise && typeof playPromise.then === 'function') {
+      await playPromise;
+    }
+  } catch (err) {
+    console.error('Playback failed on deck ' + deck.id, err);
+  } finally {
+    deck.isBusy = false;
+    syncDeckVisual(deck);
+  }
+}
+
+function stopDeck(deck) {
+  deck.audio.pause();
+
+  try {
+    deck.audio.currentTime = 0;
+  } catch {}
+
+  syncDeckVisual(deck);
+}
+
+async function toggleDeck(deck, selectEl) {
+  const assetPath = selectEl.value;
+  if (!assetPath || deck.isBusy) return;
+
+  if (deck.isPlaying) {
+    stopDeck(deck);
+    return;
+  }
+
+  await playDeck(deck, assetPath);
+}
+
+function stopBoth() {
+  stopDeck(deckA);
+  stopDeck(deckB);
+}
+
+function clearSleepTimer() {
+  if (sleepTimerId) clearTimeout(sleepTimerId);
+  if (sleepFadeId) clearInterval(sleepFadeId);
+  if (countdownIntervalId) clearInterval(countdownIntervalId);
+  sleepTimerId = null;
+  sleepFadeId = null;
+  countdownIntervalId = null;
+  sleepEndTime = null;
+}
+
+function startSleepTimer() {
+  clearSleepTimer();
+
+  const minutes = Math.max(1, parseInt($('sleepMinutes').value || '0', 10));
+  sleepEndTime = Date.now() + (minutes * 60 * 1000);
+
+  updateCountdownDisplay();
+  countdownIntervalId = setInterval(updateCountdownDisplay, 250);
+
+  sleepTimerId = setTimeout(() => {
+    if (countdownIntervalId) {
+      clearInterval(countdownIntervalId);
+      countdownIntervalId = null;
+    }
+
+    setTimerDisplay('01:00', 'Fade-out running');
+
+    const startValue = masterGain.gain.value;
+    const totalSteps = FADE_SECONDS;
+    let step = 0;
+
+    sleepFadeId = setInterval(() => {
+      step += 1;
+      const nextValue = Math.max(0, startValue * (1 - step / totalSteps));
+      masterGain.gain.value = nextValue;
+
+      const remainingFade = Math.max(0, FADE_SECONDS - step);
+      setTimerDisplay('00:' + String(remainingFade).padStart(2, '0'), 'Fade-out running');
+
+      if (step >= totalSteps) {
+        clearInterval(sleepFadeId);
+        sleepFadeId = null;
+        stopBoth();
+        masterGain.gain.value = 1;
+        sleepEndTime = null;
+        resetTimerDisplay();
+      }
+    }, 1000);
+  }, minutes * 60 * 1000);
+}
+
+function resetSleepTimer() {
+  clearSleepTimer();
+  masterGain.gain.value = 1;
+  resetTimerDisplay();
+}
+
+function escapeHtml(text) {
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function renderPresets() {
+  const list = $('presetList');
+  list.innerHTML = '';
+
+  if (state.presets.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'preset';
+    empty.innerHTML = '<div class="emptyText">No presets saved yet. Set your files and mixer settings, then save a preset.</div>';
+    list.appendChild(empty);
+    return;
+  }
+
+  state.presets.forEach((preset) => {
+    const div = document.createElement('div');
+    div.className = 'preset';
+
+    const metaA = preset.playerA?.asset ? preset.playerA.asset.split('/').pop() : 'No file';
+    const metaB = preset.playerB?.asset ? preset.playerB.asset.split('/').pop() : 'No file';
+
+    div.innerHTML = `
+      <div class="presetName">${escapeHtml(preset.name)}</div>
+      <div class="presetSub">A: ${escapeHtml(metaA)}<br>B: ${escapeHtml(metaB)}</div>
+      <div class="presetActions">
+        <button class="smallBtn" type="button" data-load="${preset.id}">Load</button>
+        <button class="smallBtn danger" type="button" data-delete="${preset.id}">Delete</button>
+      </div>
+    `;
+
+    list.appendChild(div);
+  });
+
+  document.querySelectorAll('[data-load]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = Number(btn.dataset.load);
+      const preset = state.presets.find((p) => p.id === id);
+      if (!preset) return;
+      applyPreset(preset);
+    });
+  });
+
+  document.querySelectorAll('[data-delete]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = Number(btn.dataset.delete);
+      state.presets = state.presets.filter((p) => p.id !== id);
+      persistPresets();
+      renderPresets();
+    });
+  });
+}
+
+function applyPreset(preset) {
+  $('presetName').value = preset.name || '';
+  $('assetA').value = preset.playerA?.asset || '';
+  $('assetB').value = preset.playerB?.asset || '';
+  $('volumeA').value = preset.playerA?.volume ?? 1;
+  $('bassA').value = preset.playerA?.bass ?? 0;
+  $('highA').value = preset.playerA?.high ?? 0;
+  $('volumeB').value = preset.playerB?.volume ?? 1;
+  $('bassB').value = preset.playerB?.bass ?? 0;
+  $('highB').value = preset.playerB?.high ?? 0;
+  $('sleepMinutes').value = preset.sleepMinutes ?? 30;
+  updateSliderLabels();
+  applyAllDeckSettings();
+  resetSleepTimer();
+}
+
+function saveCurrentPreset() {
+  const preset = currentPresetData();
+  const existingIndex = state.presets.findIndex((p) => p.name.toLowerCase() === preset.name.toLowerCase());
+
+  if (existingIndex >= 0) {
+    preset.id = state.presets[existingIndex].id;
+    state.presets[existingIndex] = preset;
+  } else {
+    state.presets.unshift(preset);
+  }
+
+  persistPresets();
+  renderPresets();
+}
+
+wireDeckAudio(deckA);
+wireDeckAudio(deckB);
+updateSliderLabels();
+applyAllDeckSettings();
+renderPresets();
+syncDeckVisual(deckA);
+syncDeckVisual(deckB);
+resetTimerDisplay();
+
+$('volumeA').addEventListener('input', () => {
+  updateSliderLabels();
+  applyDeckSettings(deckA, { volume: $('volumeA'), bass: $('bassA'), high: $('highA') });
+});
+$('bassA').addEventListener('input', () => {
+  updateSliderLabels();
+  applyDeckSettings(deckA, { volume: $('volumeA'), bass: $('bassA'), high: $('highA') });
+});
+$('highA').addEventListener('input', () => {
+  updateSliderLabels();
+  applyDeckSettings(deckA, { volume: $('volumeA'), bass: $('bassA'), high: $('highA') });
+});
+$('volumeB').addEventListener('input', () => {
+  updateSliderLabels();
+  applyDeckSettings(deckB, { volume: $('volumeB'), bass: $('bassB'), high: $('highB') });
+});
+$('bassB').addEventListener('input', () => {
+  updateSliderLabels();
+  applyDeckSettings(deckB, { volume: $('volumeB'), bass: $('bassB'), high: $('highB') });
+});
+$('highB').addEventListener('input', () => {
+  updateSliderLabels();
+  applyDeckSettings(deckB, { volume: $('volumeB'), bass: $('bassB'), high: $('highB') });
+});
+
+$('playA').addEventListener('click', async () => {
+  await toggleDeck(deckA, $('assetA'));
+});
+$('playB').addEventListener('click', async () => {
+  await toggleDeck(deckB, $('assetB'));
+});
+
+$('startSleep').addEventListener('click', startSleepTimer);
+$('resetSleep').addEventListener('click', resetSleepTimer);
+$('savePreset').addEventListener('click', saveCurrentPreset);
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    stopBoth();
+    resetSleepTimer();
+  }
+});
+</script>
+</body>
+</html>
