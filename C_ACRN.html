@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>MyTinnitus – ACRN</title>
+
+  <style>
+    :root{
+      --bg0:#070a12;
+      --bg1:#0b1020;
+      --card:#101727;
+      --card2:#0d1423;
+      --line:#22314a;
+
+      --text:#f5f7ff;
+      --muted:#b6c2de;
+
+      --accent:#ff6b7a;
+      --shadow: 0 10px 28px rgba(0,0,0,.45);
+      --radius: 18px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 600px at 50% -200px, rgba(255,255,255,.12), transparent 55%),
+        radial-gradient(900px 500px at 20% -150px, rgba(106,166,255,.12), transparent 58%),
+        linear-gradient(180deg, var(--bg1), var(--bg0));
+    }
+
+    .phone{
+      width:min(393px, 100vw);
+      min-height: 852px;
+      margin:0 auto;
+      padding: 16px 14px 96px 14px;
+    }
+
+    /* Header centered */
+    .topbar{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding-top: 10px;
+      text-align:center;
+    }
+    .moon{
+      width:34px;height:34px;border-radius:50%;
+      background: var(--accent);
+      position:relative;
+      box-shadow: 0 0 0 3px rgba(255,107,122,.08);
+    }
+    .moon:after{
+      content:""; position:absolute; width:26px;height:26px;border-radius:50%;
+      right:-2px; top:4px; background: rgba(0,0,0,.35);
+    }
+    h1{margin:0;font-size:40px;line-height:1;}
+    .sub{margin-top:6px;font-size:18px;font-weight:750;opacity:.95;}
+
+    .card{
+      margin-top: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent 55%), var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .title{
+      text-align:center;
+      font-weight:750;
+      font-size:16px;
+      margin: 4px 0 18px 0;
+    }
+
+    /* Slider column: slider + label below, centered */
+    .sliderCol{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap: 10px;                 /* Abstand Slider <-> Hz bleibt gleich */
+      padding: 18px 8px 18px 8px;/* mehr Abstand oben und unten */
+    }
+
+    /* nicer slider track */
+    input[type="range"]{
+      width: 85%;
+      -webkit-appearance:none;
+      height: 5px;
+      border-radius:999px;
+      background: rgba(255,255,255,.12);
+      outline:none;
+      box-shadow:
+        0 0 10px rgba(255,107,122,.18),
+        inset 0 0 6px rgba(0,0,0,.55);
+    }
+    input[type="range"]::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      width:18px;height:18px;border-radius:50%;
+      background: var(--accent);
+      box-shadow:
+        0 0 0 6px rgba(255,107,122,.18),
+        0 0 12px rgba(255,107,122,.55);
+      border:none;
+      cursor:pointer;
+    }
+    input[type="range"]::-moz-range-thumb{
+      width:18px;height:18px;border-radius:50%;
+      background: var(--accent);
+      border:none;
+      box-shadow:
+        0 0 0 6px rgba(255,107,122,.18),
+        0 0 12px rgba(255,107,122,.55);
+      cursor:pointer;
+    }
+
+    .freqBelow{
+      font-variant-numeric: tabular-nums;
+      text-align:center;
+      font-weight: 750;
+      opacity:.92;
+      min-height: 20px;
+    }
+
+    .bigPlayWrap{display:flex;justify-content:center;padding: 14px 0 8px 0;}
+    .bigPlay{
+      width: 84px;height: 84px;border-radius: 999px;
+      border: 4px solid rgba(255,255,255,.92);
+      background: transparent; display:grid; place-items:center; cursor:pointer;
+    }
+    .bigPlay svg{width:40px;height:40px;fill:rgba(255,255,255,.95)}
+    .bigPlay.stop{border-color: rgba(255,107,122,.95);}
+    .bigPlay.stop svg{fill: rgba(255,107,122,.95)}
+
+    .cta{
+      margin-top: 12px;
+      width:100%;
+      border-radius: 16px;
+      border:1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)), var(--card2);
+      color: var(--text);
+      padding: 14px 14px;
+      font-size: 18px;
+      font-weight: 750;
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      cursor:pointer;
+      box-shadow: var(--shadow);
+    }
+
+    .list{
+      margin-top: 14px;
+      border-radius: var(--radius);
+      overflow:hidden;
+      border:1px solid var(--line);
+      background: rgba(0,0,0,.15);
+      box-shadow: var(--shadow);
+    }
+
+    .preset{
+      padding: 12px 12px;
+      background: rgba(255,255,255,.02);
+    }
+    .preset + .preset{ border-top: 1px solid rgba(255,255,255,.07); }
+
+    .presetTop{
+      display:grid;
+      grid-template-columns: 64px 1fr;
+      gap: 12px;
+      align-items:center;
+    }
+
+    .miniBtn{
+      width:56px;height:56px;border-radius:999px;
+      border:3px solid rgba(255,255,255,.92);
+      background: transparent; cursor:pointer;
+      display:grid;place-items:center;
+    }
+    .miniBtn svg{width:28px;height:28px;fill:rgba(255,255,255,.95)}
+    .miniBtn.stop{border-color: rgba(255,107,122,.95);}
+    .miniBtn.stop svg{fill: rgba(255,107,122,.95)}
+
+    .hzMain{
+      font-weight: 850;
+      font-size: 18px;
+      font-variant-numeric: tabular-nums;
+    }
+    .hzSub{
+      margin-top:4px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.25;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .infoCard{
+      margin-top: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), transparent 55%), var(--card);
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px 16px;
+      text-align:center;
+    }
+    .infoCard p{
+      margin: 0 0 12px 0;
+      color: var(--text);
+      opacity: .95;
+      font-size: 13.5px;
+      line-height: 1.35;
+    }
+    .infoCard p:last-child{ margin-bottom:0; }
+  </style>
+
+  <script src="https://unpkg.com/tone@14.8.49/build/Tone.js"></script>
+</head>
+
+<body>
+  <div class="phone">
+    <div class="topbar">
+      <div class="moon" aria-hidden="true"></div>
+      <div>
+        <h1>MyTinnitus</h1>
+        <div class="sub">Acoustic Coordinated Reset</div>
+      </div>
+    </div>
+
+    <!-- FIND -->
+    <div class="card">
+      <div class="title">Find your frequency</div>
+
+      <div class="sliderCol">
+        <input id="freq" type="range" min="20" max="20000" step="1" />
+        <div class="freqBelow" id="freqLabel">–</div>
+      </div>
+
+      <div class="bigPlayWrap">
+        <button class="bigPlay" id="findPlay" aria-label="Play/Stop find tone">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <path d="M24 18v28l26-14z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <button class="cta" id="btnSet">
+      <span>Set Frequency</span>
+    </button>
+
+    <!-- PRESETS -->
+    <div class="list" id="presetList"></div>
+
+    <!-- INFO -->
+    <div class="infoCard">
+      <p>
+        Acoustic Coordinated Reset Neuromodulation (ACRN) is a tinnitus therapy that uses several
+        short tones placed around a person's tinnitus frequency.
+      </p>
+      <p>
+        First the tinnitus pitch is measured. Then four tones slightly above and below that frequency
+        are played in a repeating sequence through headphones.
+      </p>
+      <p>
+        The tones are brief and presented in a specific pattern. The goal is to disrupt abnormal
+        synchronized activity in auditory neurons that is believed to contribute to tinnitus.
+      </p>
+      <p>
+        Over repeated sessions the brain may reduce this hyper-synchronization. Some patients report a
+        decrease in tinnitus loudness over time.
+      </p>
+      <p>
+        The method was developed by researchers around Peter A. Tass at the Forschungszentrum Jülich, Germany.
+      </p>
+    </div>
+  </div>
+
+<script>
+/* =========================
+   Helpers
+========================= */
+const $ = (id) => document.getElementById(id);
+const clamp = (n,a,b)=>Math.min(Math.max(n,a),b);
+
+function fmtHz(hz){
+  if (hz >= 1000) return (hz/1000).toFixed(1) + " kHz";
+  return Math.round(hz) + " Hz";
+}
+
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+
+/* ACRN formula */
+function generateAcrnFrequencies(baseHz){
+  const f = baseHz;
+  return [
+    Math.floor(f * 0.773 - 44.5),
+    Math.floor(f * 0.903 - 21.5),
+    Math.floor(f * 1.09 + 52),
+    Math.floor(f * 1.395 + 26.5),
+  ].map(x => clamp(x, 20, 20000));
+}
+
+/* =========================
+   Persistence (max 3 presets)
+========================= */
+const LS_KEY = "mytinnitus_presets_v1";
+function loadPresets(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return [];
+    const arr = JSON.parse(raw);
+    if(!Array.isArray(arr)) return [];
+    return arr.slice(0,3);
+  }catch(e){ return []; }
+}
+function savePresets(list){
+  localStorage.setItem(LS_KEY, JSON.stringify(list.slice(0,3)));
+}
+
+/* =========================
+   Audio Engine (Tone.js)
+========================= */
+const vol = new Tone.Volume(-24).toDestination(); // Sicherheitspegel
+let findOsc = null;
+let findPlaying = false;
+
+let acrnSynth = null;
+let acrnSeq = null;
+let acrnPlayingPresetId = null;
+let freqPool = [];
+let stopTimeout = null;
+
+async function ensureAudio(){
+  await Tone.start();
+}
+
+function setBigBtnVisual(isStop){
+  const b = $("findPlay");
+  b.classList.toggle("stop", !!isStop);
+  b.innerHTML = isStop
+    ? `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 22h20v20H22z"></path></svg>`
+    : `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M24 18v28l26-14z"></path></svg>`;
+}
+
+function setMiniBtnVisual(btn, isStop){
+  btn.classList.toggle("stop", !!isStop);
+  btn.innerHTML = isStop
+    ? `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M22 22h20v20H22z"></path></svg>`
+    : `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M24 18v28l26-14z"></path></svg>`;
+}
+
+function stopFind(){
+  if(findOsc){
+    try{ findOsc.stop(); }catch(e){}
+    try{ findOsc.dispose(); }catch(e){}
+    findOsc = null;
+  }
+  findPlaying = false;
+  setBigBtnVisual(false);
+}
+
+async function startFind(freqHz){
+  await ensureAudio();
+  stopAcrn();
+
+  if(!findOsc){
+    findOsc = new Tone.Oscillator({ type:"sine", frequency: freqHz }).connect(vol);
+  }
+  findOsc.frequency.rampTo(freqHz, 0.03);
+  findOsc.start();
+  findPlaying = true;
+  setBigBtnVisual(true);
+}
+
+async function toggleFind(){
+  if(findPlaying) stopFind();
+  else await startFind(state.freqHz);
+}
+
+function updateFindFreq(freqHz){
+  if(findOsc && findPlaying){
+    findOsc.frequency.rampTo(freqHz, 0.02);
+  }
+}
+
+function stopAcrn(){
+  if(stopTimeout){ clearTimeout(stopTimeout); stopTimeout = null; }
+
+  try{ Tone.Transport.stop(); }catch(e){}
+  try{ Tone.Transport.cancel(0); }catch(e){}
+
+  if(acrnSeq){
+    try{ acrnSeq.dispose(); }catch(e){}
+    acrnSeq = null;
+  }
+  if(acrnSynth){
+    try{ acrnSynth.releaseAll(); }catch(e){}
+    try{ acrnSynth.dispose(); }catch(e){}
+    acrnSynth = null;
+  }
+  acrnPlayingPresetId = null;
+
+  document.querySelectorAll(".miniBtn").forEach(b => setMiniBtnVisual(b, false));
+}
+
+function buildSheet(loopRepeat, restLength){
+  const SHEET_RANDOM = 0;
+  const SHEET_REST = 1;
+  const sheet = [];
+  for(let i=0;i<loopRepeat;i++){
+    sheet.push(SHEET_RANDOM, SHEET_RANDOM, SHEET_RANDOM, SHEET_RANDOM);
+  }
+  for(let i=0;i<restLength;i++){
+    sheet.push(SHEET_REST);
+  }
+  return { sheet, SHEET_RANDOM, SHEET_REST };
+}
+
+async function startAcrn(preset){
+  await ensureAudio();
+  stopFind();
+  stopAcrn();
+
+  const freqs = preset.acrn.slice();
+  freqPool = shuffle(freqs);
+
+  acrnSynth = new Tone.PolySynth(Tone.Synth, {
+    oscillator: { type: "sine" },
+    envelope: { attack: 0.10, decay: 0.0, sustain: 0.07, release: 0.08 }
+  }).connect(vol);
+
+  const bpm = 180;
+  const loopRepeat = 3;
+  const restLength = 8;
+  const noteDuration = "8n";
+
+  Tone.Transport.bpm.value = bpm;
+
+  const { sheet, SHEET_RANDOM, SHEET_REST } = buildSheet(loopRepeat, restLength);
+
+  acrnSeq = new Tone.Sequence((time, note) => {
+    if(note === SHEET_REST) return;
+
+    if(note === SHEET_RANDOM){
+      let f = freqPool.pop();
+      if(f == null){
+        freqPool = shuffle(freqs);
+        f = freqPool.pop();
+      }
+      acrnSynth.triggerAttackRelease(f, noteDuration, time);
+    }
+  }, sheet);
+
+  acrnSeq.loop = true;
+  acrnSeq.start(0);
+  Tone.Transport.start();
+
+  acrnPlayingPresetId = preset.id;
+
+  const btn = document.querySelector(`.miniBtn[data-id="${preset.id}"]`);
+  if(btn) setMiniBtnVisual(btn, true);
+}
+
+async function togglePresetPlay(preset){
+  if(acrnPlayingPresetId === preset.id){
+    stopAcrn();
+    return;
+  }
+  await startAcrn(preset);
+}
+
+/* =========================
+   App State
+========================= */
+let state = {
+  freqHz: 13000,
+  presets: loadPresets()
+};
+
+function applyFreqLabel(){
+  $("freqLabel").textContent = fmtHz(state.freqHz);
+}
+
+function renderPresets(){
+  const list = $("presetList");
+  list.innerHTML = "";
+
+  if(state.presets.length === 0){
+    const empty = document.createElement("div");
+    empty.className = "preset";
+    empty.innerHTML = `<div class="hzSub">Noch keine Presets. Wähle oben eine Frequenz und drücke „Set Frequency“.</div>`;
+    list.appendChild(empty);
+    return;
+  }
+
+  state.presets.forEach((p) => {
+    const div = document.createElement("div");
+    div.className = "preset";
+
+    const acrnText = p.acrn.map(fmtHz).join("  ·  ");
+
+    div.innerHTML = `
+      <div class="presetTop">
+        <button class="miniBtn" data-id="${p.id}" aria-label="Play/Stop ACRN preset">
+          <svg viewBox="0 0 64 64" aria-hidden="true"><path d="M24 18v28l26-14z"></path></svg>
+        </button>
+        <div>
+          <div class="hzMain">${fmtHz(p.base)} <span style="color:var(--muted);font-weight:650;font-size:13px;">(base)</span></div>
+          <div class="hzSub">${acrnText}</div>
+        </div>
+      </div>
+    `;
+
+    list.appendChild(div);
+  });
+
+  document.querySelectorAll(".miniBtn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
+      const preset = state.presets.find(x => String(x.id) === String(id));
+      if(!preset) return;
+      await togglePresetPlay(preset);
+    });
+  });
+
+  if(acrnPlayingPresetId != null){
+    const btn = document.querySelector(`.miniBtn[data-id="${acrnPlayingPresetId}"]`);
+    if(btn) setMiniBtnVisual(btn, true);
+  }
+}
+
+function addPresetFromCurrent(){
+  const base = Math.round(state.freqHz);
+  const acrn = generateAcrnFrequencies(base);
+
+  const preset = {
+    id: Date.now(),
+    base,
+    acrn
+  };
+
+  const next = [preset, ...state.presets];
+  state.presets = next.slice(0,3);
+  savePresets(state.presets);
+
+  stopAcrn();
+  renderPresets();
+}
+
+/* =========================
+   Wire UI
+========================= */
+$("freq").value = state.freqHz;
+applyFreqLabel();
+renderPresets();
+setBigBtnVisual(false);
+
+$("findPlay").addEventListener("click", toggleFind);
+
+$("freq").addEventListener("input", (e) => {
+  state.freqHz = clamp(Number(e.target.value), 20, 20000);
+  applyFreqLabel();
+  updateFindFreq(state.freqHz);
+});
+
+$("btnSet").addEventListener("click", addPresetFromCurrent);
+
+document.addEventListener("visibilitychange", () => {
+  if(document.hidden){
+    stopFind();
+    stopAcrn();
+  }
+});
+</script>
+</body>
+</html>
