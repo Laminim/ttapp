@@ -1,0 +1,1067 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>MyTinnitus – Hearing Test</title>
+<style>
+:root{
+  --bg0:#070a12;
+  --bg1:#0b1020;
+  --card:#101727;
+  --card2:#0d1423;
+  --line:#22314a;
+  --text:#f5f7ff;
+  --muted:#b6c2de;
+  --accent:#ff6b7a;
+  --good:#65d69e;
+  --warn:#ffd166;
+  --bad:#ff8d8d;
+  --shadow:0 10px 28px rgba(0,0,0,.45);
+  --radius:18px;
+}
+
+html,body{
+  margin:0;
+  padding:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
+*{box-sizing:border-box}
+
+body{
+  font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+  color:var(--text);
+  background:
+    radial-gradient(1200px 600px at 50% -200px, rgba(255,255,255,.12), transparent 55%),
+    radial-gradient(900px 500px at 20% -150px, rgba(106,166,255,.12), transparent 58%),
+    linear-gradient(180deg, var(--bg1), var(--bg0));
+}
+
+.phone{
+  width:393px;
+  max-width:393px;
+  height:852px;
+  margin:0 auto;
+  padding:16px 14px 24px;
+  overflow-x:hidden;
+  overflow-y:auto;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+}
+.phone::-webkit-scrollbar{display:none}
+
+.topbar{
+  text-align:center;
+  padding-top:8px;
+}
+
+h1{
+  margin:0;
+  font-size:28px;
+  line-height:1.05;
+  font-weight:850;
+}
+
+.sub{
+  margin-top:8px;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.35;
+}
+
+.card{
+  margin-top:14px;
+  background:linear-gradient(180deg, rgba(255,255,255,.03), transparent 55%), var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:14px;
+}
+
+.hidden{display:none !important}
+
+.title{
+  text-align:center;
+  font-weight:800;
+  font-size:22px;
+  margin:4px 0 6px;
+}
+
+.smallTitle{
+  text-align:center;
+  font-weight:750;
+  font-size:16px;
+  margin:0 0 12px;
+}
+
+.copy{
+  color:var(--muted);
+  font-size:13.5px;
+  line-height:1.42;
+}
+
+.copy p{
+  margin:0 0 10px;
+}
+.copy p:last-child{margin-bottom:0}
+
+.badgeRow{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  justify-content:center;
+  margin-top:12px;
+}
+.badge{
+  padding:8px 10px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.03);
+  color:var(--muted);
+  font-size:12px;
+  font-weight:700;
+}
+
+.progressWrap{
+  margin-top:8px;
+}
+.progressTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:8px;
+}
+.progressBar{
+  height:8px;
+  border-radius:999px;
+  background:rgba(255,255,255,.10);
+  overflow:hidden;
+}
+.progressFill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg, rgba(255,107,122,.65), rgba(255,107,122,.95));
+  border-radius:999px;
+  box-shadow:0 0 14px rgba(255,107,122,.35);
+}
+
+.testHero{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:12px 6px 6px;
+}
+
+.freqBubble{
+  min-width:144px;
+  min-height:144px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,.1);
+  background:radial-gradient(circle at 35% 30%, rgba(255,255,255,.10), rgba(255,255,255,.02) 45%, rgba(255,255,255,.02));
+  box-shadow:var(--shadow), inset 0 0 40px rgba(255,255,255,.03);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:18px;
+}
+.freqMain{
+  font-size:34px;
+  font-weight:850;
+  line-height:1;
+}
+.freqSub{
+  margin-top:6px;
+  font-size:13px;
+  color:var(--muted);
+  font-weight:700;
+}
+
+.levelCard{
+  margin-top:12px;
+  border-radius:16px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);
+  padding:12px;
+}
+.levelHead{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+  font-size:13px;
+  font-weight:750;
+  margin-bottom:10px;
+}
+.levelVal{
+  color:var(--muted);
+  font-variant-numeric:tabular-nums;
+}
+.levelMeter{
+  height:10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.12);
+  overflow:hidden;
+  box-shadow:inset 0 0 6px rgba(0,0,0,.55);
+}
+.levelMeterFill{
+  height:100%;
+  width:100%;
+  background:linear-gradient(90deg, rgba(101,214,158,.85), rgba(255,209,102,.9), rgba(255,107,122,.95));
+  border-radius:999px;
+}
+
+.bigPlayWrap{
+  display:flex;
+  justify-content:center;
+  padding:14px 0 8px;
+}
+.bigPlay{
+  width:92px;
+  height:92px;
+  border-radius:999px;
+  border:4px solid rgba(255,255,255,.92);
+  background:transparent;
+  display:grid;
+  place-items:center;
+  cursor:pointer;
+}
+.bigPlay svg{
+  width:42px;
+  height:42px;
+  fill:rgba(255,255,255,.95);
+}
+.bigPlay.stop{
+  border-color:rgba(255,107,122,.95);
+}
+.bigPlay.stop svg{
+  fill:rgba(255,107,122,.95);
+}
+
+.statusText{
+  text-align:center;
+  font-size:13px;
+  line-height:1.35;
+  color:var(--muted);
+  min-height:36px;
+}
+
+.cta,
+.smallBtn,
+.ghostBtn{
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)), var(--card2);
+  color:var(--text);
+  box-shadow:var(--shadow);
+  cursor:pointer;
+}
+
+.cta{
+  margin-top:14px;
+  width:100%;
+  padding:14px;
+  font-size:18px;
+  font-weight:750;
+  display:flex;
+  justify-content:center;
+}
+
+.btnRow{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
+.smallBtn,
+.ghostBtn{
+  flex:1;
+  padding:12px 10px;
+  font-size:14px;
+  font-weight:750;
+}
+.ghostBtn{
+  background:rgba(255,255,255,.02);
+}
+
+.tipBox{
+  margin-top:12px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.03);
+  padding:12px;
+  color:var(--muted);
+  font-size:12.5px;
+  line-height:1.42;
+}
+
+.resultHero{
+  text-align:center;
+}
+.resultGrade{
+  font-size:28px;
+  font-weight:850;
+  line-height:1;
+}
+.resultLabel{
+  margin-top:8px;
+  color:var(--muted);
+  font-size:14px;
+}
+
+.miniStats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:12px;
+}
+.statCard{
+  border-radius:16px;
+  background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.07);
+  padding:12px;
+  text-align:center;
+}
+.statValue{
+  font-size:22px;
+  font-weight:850;
+  line-height:1;
+}
+.statLabel{
+  margin-top:6px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.canvasWrap{
+  margin-top:14px;
+  border-radius:16px;
+  border:1px solid rgba(255,255,255,.08);
+  background:#0a101d;
+  overflow:hidden;
+}
+canvas{
+  width:100%;
+  height:auto;
+  display:block;
+}
+
+.resultList{
+  margin-top:14px;
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.02);
+}
+.resultRow{
+  display:grid;
+  grid-template-columns:1fr auto auto;
+  gap:10px;
+  padding:12px;
+  align-items:center;
+}
+.resultRow + .resultRow{
+  border-top:1px solid rgba(255,255,255,.06);
+}
+.resultHz{
+  font-weight:800;
+}
+.resultDb,
+.resultCat{
+  color:var(--muted);
+  font-size:13px;
+}
+
+.footerNote{
+  margin-top:14px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.42;
+  text-align:center;
+}
+
+@media (max-width:360px){
+  .freqBubble{min-width:132px; min-height:132px;}
+  .freqMain{font-size:30px;}
+}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="topbar">
+    <h1>Hearing Test</h1>
+    <div class="sub">Quick hearing check with an audiogram at the end</div>
+  </div>
+
+  <div class="card" id="introScreen">
+    <div class="title">How it works</div>
+    <div class="copy">
+      <p>Use headphones and sit in a quiet room.</p>
+      <p>After you press start, you will first get a short volume check.</p>
+      <p>For each frequency, the tone starts louder and slowly gets softer. Press <b>Stop</b> as soon as you can no longer hear it.</p>
+      <p>At the end, you will see a simple audiogram. This test is only a rough guide and does not replace a professional hearing test.</p>
+    </div>
+    <button class="cta" id="startTestBtn" type="button">Start test</button>
+  </div>
+
+  <div class="card hidden" id="volumeScreen">
+    <div class="title">Volume check</div>
+
+    <div class="levelCard">
+      <div class="levelHead">
+        <span>Start volume</span>
+      </div>
+      <input id="volumeSlider" type="range" min="10" max="100" value="45" step="1" style="width:100%;margin-top:4px;accent-color:var(--accent);background:transparent;">
+    </div>
+
+    <div class="bigPlayWrap">
+      <button class="bigPlay" id="previewBtn" type="button" aria-label="Play or stop preview tone">
+        <svg viewBox="0 0 64 64"><path d="M24 18v28l26-14z"/></svg>
+      </button>
+    </div>
+
+    <div class="statusText hidden" id="previewStatusText"></div>
+
+    <div class="bigPlayWrap" style="padding-top:8px;">
+      <button class="smallBtn" id="volumeContinueBtn" type="button" style="max-width:220px;">Volume OK</button>
+    </div>
+  </div>
+
+  <div class="card hidden" id="testScreen">
+    <div class="progressWrap">
+      <div class="progressTop">
+        <span id="progressText">Step 1 of 10</span>
+        <span id="heardCountText">0 saved</span>
+      </div>
+      <div class="progressBar"><div class="progressFill" id="progressFill"></div></div>
+    </div>
+
+    <div class="testHero">
+      <div class="freqBubble">
+        <div>
+          <div class="freqMain" id="freqMain">1000</div>
+          <div class="freqSub" id="freqSub">Hz test tone</div>
+        </div>
+      </div>
+      <div class="smallTitle" id="stepTitle">Press Start to play the test tone</div>
+    </div>
+
+    <div class="levelCard">
+      <div class="levelHead">
+        <span>Level</span>
+        <span class="levelVal" id="levelValue">100%</span>
+      </div>
+      <div class="levelMeter"><div class="levelMeterFill" id="levelMeterFill"></div></div>
+    </div>
+
+    <div class="bigPlayWrap">
+      <button class="bigPlay" id="playBtn" type="button" aria-label="Start or stop">
+        <svg viewBox="0 0 64 64"><path d="M24 18v28l26-14z"/></svg>
+      </button>
+    </div>
+
+    <div class="statusText" id="statusText">After you press Start, the tone slowly gets softer.</div>
+
+    <div class="btnRow">
+      <button class="ghostBtn" id="backBtn" type="button">Back</button>
+      <button class="smallBtn" id="nextBtn" type="button">Next</button>
+    </div>
+
+    <div class="tipBox">Tip: Press Stop at the exact moment when you can no longer hear the tone. The current value will be saved as your threshold.</div>
+  </div>
+
+  <div class="card hidden" id="resultScreen">
+    <div class="resultHero">
+      <div class="resultGrade" id="resultGrade">Normal hearing</div>
+      <div class="resultLabel" id="resultLabel">Your hearing is within the normal range across most tested frequencies.</div>
+      <div class="resultLabel" id="resultDetailLabel">Low frequencies are normal. Mid frequencies are normal. High frequencies are normal.</div>
+    </div>
+
+    <div class="canvasWrap">
+      <canvas id="audiogramCanvas" width="720" height="520"></canvas>
+    </div>
+
+    <div class="resultList" id="resultList"></div>
+
+    <button class="cta" id="restartBtn" type="button">Test again</button>
+
+    <div class="footerNote">Online hearing tests are only a rough guide. Reliable hearing measurements need calibrated hardware and a professional exam.</div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+
+  const TEST_FREQUENCIES = [250, 500, 1000, 2000, 3000, 4000, 6000, 8000, 10000, 12000];
+  const START_DB = 80;
+  const END_DB = -5;
+  const DB_STEP = 1;
+  const STEP_EVERY_MS = 280;
+  const PREVIEW_FREQUENCY = 1000;
+
+  const introScreen = $('introScreen');
+  const volumeScreen = $('volumeScreen');
+  const testScreen = $('testScreen');
+  const resultScreen = $('resultScreen');
+  const startTestBtn = $('startTestBtn');
+    const volumeContinueBtn = $('volumeContinueBtn');
+  const previewBtn = $('previewBtn');
+  const volumeSlider = $('volumeSlider');
+      const previewStatusText = $('previewStatusText');
+  const playBtn = $('playBtn');
+  const backBtn = $('backBtn');
+  const nextBtn = $('nextBtn');
+  const restartBtn = $('restartBtn');
+  const freqMain = $('freqMain');
+  const stepTitle = $('stepTitle');
+  const statusText = $('statusText');
+  const levelValue = $('levelValue');
+  const levelMeterFill = $('levelMeterFill');
+  const progressText = $('progressText');
+  const heardCountText = $('heardCountText');
+  const progressFill = $('progressFill');
+  const resultGrade = $('resultGrade');
+  const resultLabel = $('resultLabel');
+      const resultList = $('resultList');
+  const canvas = $('audiogramCanvas');
+  const ctx = canvas.getContext('2d');
+
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  const audioCtx = new AudioContextClass();
+  let oscillator = null;
+  let gainNode = null;
+  let previewOscillator = null;
+  let previewGainNode = null;
+  let stepTimer = null;
+  let isPlaying = false;
+  let isPreviewPlaying = false;
+
+  const state = {
+    index: 0,
+    currentDb: START_DB,
+    results: [],
+    userVolume: 45
+  };
+
+  function clamp(n, min, max){
+    return Math.min(Math.max(n, min), max);
+  }
+
+  function baseDbToGain(db){
+    const normalized = clamp((db - END_DB) / (START_DB - END_DB), 0, 1);
+    return 0.0001 + Math.pow(normalized, 2.15) * 0.32;
+  }
+
+  function effectiveGain(db){
+    const volumeFactor = clamp(state.userVolume / 100, 0.1, 1);
+    return baseDbToGain(db) * volumeFactor;
+  }
+
+  function dbToPercent(db){
+    return Math.round(clamp((db - END_DB) / (START_DB - END_DB), 0, 1) * 100);
+  }
+
+  function updateVolumeUi(){
+    volumeSlider.value = state.userVolume;
+  }
+
+  function currentFrequency(){
+    return TEST_FREQUENCIES[state.index];
+  }
+
+  function setPlayVisual(stopState){
+    playBtn.classList.toggle('stop', !!stopState);
+    playBtn.innerHTML = stopState
+      ? '<svg viewBox="0 0 64 64"><path d="M22 22h20v20H22z"/></svg>'
+      : '<svg viewBox="0 0 64 64"><path d="M24 18v28l26-14z"/></svg>';
+  }
+
+  function showScreen(name){
+    introScreen.classList.add('hidden');
+    volumeScreen.classList.add('hidden');
+    testScreen.classList.add('hidden');
+    resultScreen.classList.add('hidden');
+    if(name === 'intro') introScreen.classList.remove('hidden');
+    if(name === 'volume') volumeScreen.classList.remove('hidden');
+    if(name === 'test') testScreen.classList.remove('hidden');
+    if(name === 'result') resultScreen.classList.remove('hidden');
+  }
+
+  async function ensureAudio(){
+    if(audioCtx.state !== 'running'){
+      await audioCtx.resume();
+    }
+  }
+
+  function createTone(){
+    if(oscillator) return;
+    gainNode = audioCtx.createGain();
+    gainNode.gain.value = 0;
+    oscillator = audioCtx.createOscillator();
+    oscillator.type = 'sine';
+    oscillator.frequency.value = currentFrequency();
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    oscillator.start();
+  }
+
+  function setPreviewVisual(stopState){
+    previewBtn.classList.toggle('stop', !!stopState);
+    previewBtn.innerHTML = stopState
+      ? '<svg viewBox="0 0 64 64"><path d="M22 22h20v20H22z"/></svg>'
+      : '<svg viewBox="0 0 64 64"><path d="M24 18v28l26-14z"/></svg>';
+  }
+
+  function createPreviewTone(){
+    if(previewOscillator) return;
+    previewGainNode = audioCtx.createGain();
+    previewGainNode.gain.value = 0;
+    previewOscillator = audioCtx.createOscillator();
+    previewOscillator.type = 'sine';
+    previewOscillator.frequency.value = PREVIEW_FREQUENCY;
+    previewOscillator.connect(previewGainNode);
+    previewGainNode.connect(audioCtx.destination);
+    previewOscillator.start();
+  }
+
+  function stopTone(){
+    if(stepTimer){
+      clearInterval(stepTimer);
+      stepTimer = null;
+    }
+    if(gainNode){
+      gainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+      gainNode.gain.setTargetAtTime(0.00001, audioCtx.currentTime, 0.02);
+    }
+    isPlaying = false;
+    setPlayVisual(false);
+  }
+
+  function stopPreviewTone(){
+    if(previewGainNode){
+      previewGainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+      previewGainNode.gain.setTargetAtTime(0.00001, audioCtx.currentTime, 0.02);
+    }
+    isPreviewPlaying = false;
+    setPreviewVisual(false);
+  }
+
+  function destroyTone(){
+    stopTone();
+    if(oscillator){
+      try{ oscillator.stop(); }catch(e){}
+      try{ oscillator.disconnect(); }catch(e){}
+      oscillator = null;
+    }
+    if(gainNode){
+      try{ gainNode.disconnect(); }catch(e){}
+      gainNode = null;
+    }
+  }
+
+  function destroyPreviewTone(){
+    stopPreviewTone();
+    if(previewOscillator){
+      try{ previewOscillator.stop(); }catch(e){}
+      try{ previewOscillator.disconnect(); }catch(e){}
+      previewOscillator = null;
+    }
+    if(previewGainNode){
+      try{ previewGainNode.disconnect(); }catch(e){}
+      previewGainNode = null;
+    }
+  }
+
+  function updateLevelUi(){
+    const percent = clamp(dbToPercent(state.currentDb), 0, 100);
+    levelValue.textContent = state.currentDb + ' dB HL';
+    levelMeterFill.style.width = percent + '%';
+  }
+
+  function updateProgressUi(){
+    progressText.textContent = 'Step ' + (state.index + 1) + ' of ' + TEST_FREQUENCIES.length;
+    heardCountText.textContent = state.results.length + ' saved';
+    progressFill.style.width = (((state.index) / TEST_FREQUENCIES.length) * 100) + '%';
+  }
+
+  function updateStepUi(){
+    freqMain.textContent = currentFrequency();
+    stepTitle.textContent = currentFrequency() + ' Hz test tone';
+    statusText.textContent = 'Press Start. The tone will then slowly get softer.';
+    state.currentDb = START_DB;
+    updateLevelUi();
+    updateProgressUi();
+    setPlayVisual(false);
+  }
+
+  function startDescendingTone(){
+    createTone();
+    oscillator.frequency.setValueAtTime(currentFrequency(), audioCtx.currentTime);
+    state.currentDb = START_DB;
+    updateLevelUi();
+
+    gainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+    gainNode.gain.setTargetAtTime(effectiveGain(state.currentDb), audioCtx.currentTime, 0.03);
+
+    if(stepTimer){
+      clearInterval(stepTimer);
+    }
+
+    stepTimer = setInterval(() => {
+      const next = state.currentDb - DB_STEP;
+      state.currentDb = clamp(next, END_DB, START_DB);
+      gainNode.gain.setTargetAtTime(effectiveGain(state.currentDb), audioCtx.currentTime, 0.04);
+      updateLevelUi();
+      statusText.textContent = 'Tone is playing. Press Stop as soon as you can no longer hear it.';
+
+      if(state.currentDb <= END_DB){
+        saveCurrentThreshold(true);
+      }
+    }, STEP_EVERY_MS);
+
+    isPlaying = true;
+    setPlayVisual(true);
+    statusText.textContent = 'Tone is playing. Press Stop as soon as you can no longer hear it.';
+  }
+
+  function saveCurrentThreshold(autoEnd){
+    const freq = currentFrequency();
+    const existingIndex = state.results.findIndex(x => x.freq === freq);
+    const value = clamp(state.currentDb, END_DB, START_DB);
+    const item = { freq, db: value, autoEnd: !!autoEnd };
+
+    if(existingIndex >= 0) state.results[existingIndex] = item;
+    else state.results.push(item);
+
+    stopTone();
+
+    if(autoEnd){
+      statusText.textContent = 'Minimum level reached. The threshold was saved.';
+    } else {
+      statusText.textContent = 'Saved: ' + value + ' dB HL at ' + freq + ' Hz';
+    }
+  }
+
+  function categoryIndex(db){
+    if(db <= 15) return 0;
+    if(db <= 25) return 1;
+    if(db <= 40) return 2;
+    if(db <= 55) return 3;
+    if(db <= 70) return 4;
+    return 5;
+  }
+
+  function categoryLabel(index, compact){
+    const full = [
+      'Normal hearing',
+      'Near-normal hearing',
+      'Slight hearing reduction',
+      'Mild hearing reduction',
+      'Moderate hearing reduction',
+      'Strongly reduced hearing'
+    ];
+    const short = [
+      'normal',
+      'near-normal',
+      'slight reduction',
+      'mild reduction',
+      'moderate reduction',
+      'strong reduction'
+    ];
+    return compact ? short[index] : full[index];
+  }
+
+  function thresholdCategory(db){
+    return categoryLabel(categoryIndex(db), true);
+  }
+
+  function overallCategory(avg){
+    return categoryLabel(categoryIndex(avg), false);
+  }
+
+  function resultColor(avg){
+    if(avg <= 15) return getComputedStyle(document.documentElement).getPropertyValue('--good').trim();
+    if(avg <= 25) return getComputedStyle(document.documentElement).getPropertyValue('--warn').trim();
+    return getComputedStyle(document.documentElement).getPropertyValue('--bad').trim();
+  }
+
+  function averageDb(){
+
+    if(!state.results.length) return 0;
+    const sum = state.results.reduce((a,b) => a + b.db, 0);
+    return Math.round(sum / state.results.length);
+  }
+
+  function bestDb(){
+    if(!state.results.length) return 0;
+    return Math.min(...state.results.map(x => x.db));
+  }
+
+  function getBandAverage(freqs){
+    const values = freqs
+      .map(freq => state.results.find(x => x.freq === freq))
+      .filter(Boolean)
+      .map(item => item.db);
+    if(!values.length) return null;
+    return Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+  }
+
+  function bandSentence(name, avg){
+    if(avg == null) return name + ' frequencies were not measured.';
+    const label = thresholdCategory(avg);
+    return name + ' frequencies show ' + label + '.';
+  }
+
+  function overallSummary(avg){
+    const idx = categoryIndex(avg);
+    const texts = [
+      'Your hearing is within the normal range across most tested frequencies.',
+      'Your hearing is mostly normal, with small deviations at some frequencies.',
+      'Your hearing is slightly reduced at some tested frequencies.',
+      'Your hearing shows mild reductions in several tested frequencies.',
+      'Your hearing is noticeably reduced across important parts of the tested range.',
+      'Your hearing is strongly reduced across much of the tested range.'
+    ];
+    return texts[idx];
+  }
+
+  function orderedResults(){
+    return TEST_FREQUENCIES.map(freq => state.results.find(x => x.freq === freq) || { freq, db: null });
+  }
+
+  function drawAudiogram(){
+    const w = canvas.width;
+    const h = canvas.height;
+    const padL = 70;
+    const padR = 24;
+    const padT = 26;
+    const padB = 56;
+    const plotW = w - padL - padR;
+    const plotH = h - padT - padB;
+
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = '#0a101d';
+    ctx.fillRect(0, 0, w, h);
+
+    const freqs = TEST_FREQUENCIES;
+    const dbMarks = [-5, 0, 10, 20, 30, 40, 50, 60, 70, 80];
+
+    ctx.strokeStyle = 'rgba(255,255,255,.08)';
+    ctx.lineWidth = 1;
+
+    dbMarks.forEach(db => {
+      const y = padT + ((db - END_DB) / (START_DB - END_DB)) * plotH;
+      ctx.beginPath();
+      ctx.moveTo(padL, y);
+      ctx.lineTo(w - padR, y);
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(182,194,222,.9)';
+      ctx.font = '12px system-ui';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(String(db), padL - 10, y);
+    });
+
+    freqs.forEach((f, i) => {
+      const x = padL + (i / (freqs.length - 1)) * plotW;
+      ctx.beginPath();
+      ctx.moveTo(x, padT);
+      ctx.lineTo(x, h - padB);
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(182,194,222,.9)';
+      ctx.font = '12px system-ui';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText(String(f), x, h - padB + 12);
+    });
+
+    ctx.fillStyle = 'rgba(245,247,255,.95)';
+    ctx.font = '700 14px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillText('Frequency (Hz)', w / 2, h - 18);
+
+    ctx.save();
+    ctx.translate(18, h / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'center';
+    ctx.fillText('Hearing threshold (dB HL)', 0, 0);
+    ctx.restore();
+
+    const items = orderedResults().filter(x => x.db != null);
+    if(!items.length) return;
+
+    const color = resultColor(averageDb());
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    items.forEach((item, i) => {
+      const x = padL + (freqs.indexOf(item.freq) / (freqs.length - 1)) * plotW;
+      const y = padT + ((item.db - END_DB) / (START_DB - END_DB)) * plotH;
+      if(i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+
+    items.forEach(item => {
+      const x = padL + (freqs.indexOf(item.freq) / (freqs.length - 1)) * plotW;
+      const y = padT + ((item.db - END_DB) / (START_DB - END_DB)) * plotH;
+      ctx.beginPath();
+      ctx.fillStyle = '#0a101d';
+      ctx.arc(x, y, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = color;
+      ctx.stroke();
+    });
+  }
+
+  function renderResultList(){
+    resultList.innerHTML = '';
+    orderedResults().forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'resultRow';
+      row.innerHTML = `
+        <div class="resultHz">${item.freq} Hz</div>
+        <div class="resultDb">${item.db == null ? '–' : item.db + ' dB HL'}</div>
+        <div class="resultCat">${item.db == null ? '–' : thresholdCategory(item.db)}</div>
+      `;
+      resultList.appendChild(row);
+    });
+  }
+
+  function showResults(){
+    const avg = averageDb();
+    const cat = overallCategory(avg);
+    const color = resultColor(avg);
+    const lowAvg = getBandAverage([250, 500, 1000]);
+    const midAvg = getBandAverage([2000, 3000, 4000]);
+    const highAvg = getBandAverage([6000, 8000, 10000, 12000]);
+
+    resultGrade.textContent = cat;
+    resultGrade.style.color = color;
+    resultLabel.textContent = overallSummary(avg);
+    $('resultDetailLabel').textContent = [
+      bandSentence('Low', lowAvg),
+      bandSentence('Mid', midAvg),
+      bandSentence('High', highAvg)
+    ].join(' ');
+    renderResultList();
+    drawAudiogram();
+    showScreen('result');
+  }
+
+  function nextStep(){
+    if(!state.results.find(x => x.freq === currentFrequency())){
+      statusText.textContent = 'Please start the tone and save a threshold first.';
+      return;
+    }
+
+    if(state.index >= TEST_FREQUENCIES.length - 1){
+      progressFill.style.width = '100%';
+      showResults();
+      return;
+    }
+
+    state.index += 1;
+    updateStepUi();
+  }
+
+  function prevStep(){
+    if(state.index <= 0){
+      stopTone();
+      showScreen('volume');
+      return;
+    }
+    state.index -= 1;
+    updateStepUi();
+  }
+
+  function resetAll(){
+    destroyTone();
+    destroyPreviewTone();
+    state.index = 0;
+    state.currentDb = START_DB;
+    state.results = [];
+    updateStepUi();
+    updateVolumeUi();
+    showScreen('intro');
+  }
+
+  startTestBtn.addEventListener('click', async () => {
+    await ensureAudio();
+    state.index = 0;
+    state.results = [];
+    updateStepUi();
+    updateVolumeUi();
+    showScreen('volume');
+  });
+
+
+  volumeContinueBtn.addEventListener('click', async () => {
+    await ensureAudio();
+    destroyPreviewTone();
+    state.index = 0;
+    state.results = [];
+    updateStepUi();
+    showScreen('test');
+  });
+
+  previewBtn.addEventListener('click', async () => {
+    await ensureAudio();
+    if(isPreviewPlaying){
+      stopPreviewTone();
+      return;
+    }
+    createPreviewTone();
+    previewOscillator.frequency.setValueAtTime(PREVIEW_FREQUENCY, audioCtx.currentTime);
+    previewGainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+    previewGainNode.gain.setTargetAtTime(clamp(state.userVolume / 100, 0.1, 1) * 0.18, audioCtx.currentTime, 0.03);
+    isPreviewPlaying = true;
+    setPreviewVisual(true);
+  });
+
+  volumeSlider.addEventListener('input', () => {
+    state.userVolume = Number(volumeSlider.value);
+    updateVolumeUi();
+    if(previewGainNode && isPreviewPlaying){
+      previewGainNode.gain.cancelScheduledValues(audioCtx.currentTime);
+      previewGainNode.gain.setTargetAtTime(clamp(state.userVolume / 100, 0.1, 1) * 0.18, audioCtx.currentTime, 0.03);
+    }
+  });
+
+  playBtn.addEventListener('click', async () => {
+    await ensureAudio();
+    if(isPlaying){
+      saveCurrentThreshold(false);
+      return;
+    }
+    startDescendingTone();
+  });
+
+  nextBtn.addEventListener('click', nextStep);
+  backBtn.addEventListener('click', prevStep);
+  restartBtn.addEventListener('click', resetAll);
+
+  document.addEventListener('visibilitychange', () => {
+    if(document.hidden){
+      stopTone();
+      stopPreviewTone();
+    }
+  });
+
+  updateStepUi();
+  updateVolumeUi();
+})();
+</script>
+</body>
+</html>
